@@ -1,0 +1,26 @@
+from wordcloud import WordCloud
+from wordcloud import STOPWORDS
+import re
+import matplotlib.pyplot as plt
+
+data = '''
+something
+'''
+
+# 특정 형식 제거 (화자 제거)
+lines = data.split('\n')
+cleaned_lines = [re.sub(r'^.*?:', '', line).strip() for line in lines]
+cleaned_text = ' '.join(cleaned_lines)
+
+# 제외할 단어 목록 (stopwords) 추가
+stopwords = set(STOPWORDS)
+stopwords.update(["제외할단어"])
+
+# 워드 클라우드 생성 (stopwords 인자 추가)
+wordcloud = WordCloud(width=800, height=800, background_color='white', colormap='viridis', font_path='/System/Library/Fonts/Supplemental/AppleGothic.ttf', stopwords=stopwords).generate(cleaned_text)
+
+# 워드 클라우드 표시
+plt.figure(figsize=(8, 8), facecolor=None)
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis('off')
+plt.show()
