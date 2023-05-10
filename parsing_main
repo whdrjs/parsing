@@ -2,35 +2,30 @@ import json
 import os
 from datetime import datetime
 
+
 # 감탄사 걸러내기
 def filter_exclamations(text):
     words = text.split()
-    filtered_words = [word for word in words if not (len(word) == 1 or (len(word) == 2 and word[0] == word[1]) or (len(word) <= 3 and ('~' in word or '.' in word)))]
+    filtered_words = [word for word in words if not (len(word) == 1 or (len(word) == 2 and word[0] == word[1]) or (
+            len(word) <= 3 and ('~' in word or '.' in word)))]
     return ' '.join(filtered_words)
 
+
 # JSON 데이터를 파이썬 딕셔너리로 변환
-file_name = "file.json"
+file_name = "path or file"
+
 with open(file_name, 'r', encoding='utf-8') as f:
     data = json.load(f)
 
 # 화자 정보를 저장하는 딕셔너리 생성
 speaker_info = {}
-speaker_count = {}
+speaker_count = 0
 for speaker in data['document'][0]['metadata']['speaker']:
     speaker_id = speaker['id']
-    occupation = speaker['occupation']
-    sex = speaker['sex']
-
-    key = f"{occupation}/{sex}"
-
-    # 동일한 occupation과 sex를 가진 화자 수를 계산하고 저장
-    if key not in speaker_count:
-        speaker_count[key] = 1
-    else:
-        speaker_count[key] += 1
+    speaker_count += 1
 
     # 발화자 정보에 고유한 표시 추가
-    speaker_info[speaker_id] = f"{key} {speaker_count[key]}"
+    speaker_info[speaker_id] = chr(64 + speaker_count)  # A, B, C 형식으로 변경
 
 # 결과를 output 폴더에 txt 파일로 저장
 output_dir = "output"
@@ -38,7 +33,8 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 current_time = datetime.now().strftime("%m-%d-%H-%M")
-output_file = os.path.join(output_dir, f"{file_name}_{current_time}.txt")
+file_name_only = file_name.split('/')[-1]  # 파일 이름만 추출
+output_file = os.path.join(output_dir, f"{current_time}_{file_name_only}.txt")
 
 with open(output_file, 'w', encoding='utf-8') as f:
     for utterance in data['document'][0]['utterance']:
