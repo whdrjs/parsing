@@ -36,28 +36,35 @@ def convert_jsonl_to_csv(input_file_path, output_file_path):
             lines = text.split('\n')
             for line in lines:
                 if ': ' not in line:
-                    if last_speaker == '질문' or last_speaker =='P':
+                    if last_speaker == '질문' and line.startswith('A:'):
                         question += ' ' + line
-                    elif last_speaker == 'A':
+                        last_speaker = 'A'
+                    elif last_speaker == 'A' and line.startswith('P:'):
                         answer += ' ' + line
-                    continue
-
-                speaker, content = line.split(': ', 1)
-                if speaker == 'P' or speaker == '질문':
-                    speaker = '질문'
-                    question = content
-                elif speaker == 'A':
-                    speaker = 'A'
-                    answer = content
+                        last_speaker = 'P'
+                    elif last_speaker == 'A' and line.startswith('질문:'):
+                        answer += ' ' + line
+                        last_speaker = '질문'
+                    else:
+                        continue
                 else:
-                    print(f"Error: Invalid speaker name '{speaker}' at line {line_idx}. Skipping this line.")
-                    continue
+                    speaker, content = line.split(': ', 1)
+                    if speaker == 'P' or speaker == '질문':
+                        speaker = '질문'
+                        question = content
+                    elif speaker == 'A':
+                        speaker = 'A'
+                        answer = content
+                    else:
+                        print(f"Error: Invalid speaker name '{speaker}' at line {line_idx}. Skipping this line.")
+                        continue
 
-                last_speaker = speaker
-                csv_writer.writerow([conversation_idx, line_idx, question, answer])
-                line_idx += 1
-                question = ''
-                answer = ''
+                    last_speaker = speaker
+                    csv_writer.writerow([conversation_idx, line_idx, question, answer])
+                    line_idx += 1
+                    question = ''
+                    answer = ''
+
 
 
 # 변환 실행
