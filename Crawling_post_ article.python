@@ -1,0 +1,30 @@
+import requests
+from bs4 import BeautifulSoup
+
+class PythonOrgScraper:
+    def __init__(self):
+        self.url = 'https://www.python.org/blogs/'
+        self.response = requests.get(self.url)
+        self.soup = BeautifulSoup(self.response.content, 'html5lib')
+
+    def get_titles(self, tag, class_name):
+        titles = self.soup.find_all(tag, class_=class_name)
+        return [title.text for title in titles]
+
+    def print_titles(self, title_list):
+        for title in title_list:
+            print(title)
+
+def main():
+    scraper = PythonOrgScraper()
+
+    print("Python.org News Headlines:")
+    news_titles = scraper.get_titles('h2', 'widget-title')
+    scraper.print_titles(news_titles)
+
+    print("\nPython.org Blog Posts:")
+    blog_posts = scraper.get_titles('a', 'card-title')
+    scraper.print_titles(blog_posts)
+
+if __name__ == "__main__":
+    main()
