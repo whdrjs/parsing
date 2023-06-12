@@ -1,5 +1,4 @@
 import pandas as pd
-import json
 import ast
 
 # CSV 파일을 읽어옵니다.
