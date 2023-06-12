@@ -1,0 +1,25 @@
+import pandas as pd
+import json
+import ast
+
+# CSV 파일을 읽어옵니다.
+csv_file = '.csv'  # 여기에 실제 경로와 파일 이름을 입력하세요.
+df = pd.read_csv(csv_file)
+
+# 특정 조건에 맞는 행만 추출합니다.
+filtered_df = df[(df['source'] == 'public') | (df['source'] == 'monologue')]
+
+
+# 문자열 형태의 사전에서 'occupation' 값만 추출
+def extract_occupation(target_speaker_str):
+    target_speaker_dict = ast.literal_eval(target_speaker_str)
+    return target_speaker_dict.get('occupation')
+
+
+# 'occupation'에 대한 통계를 계산합니다.
+occupation_stats = filtered_df['target_speaker'].apply(extract_occupation).value_counts()
+
+# 결과를 txt 파일로 저장
+with open('occupation_stats.txt', 'w', encoding='utf-8') as f:
+    for occupation, count in occupation_stats.items():
+        f.write(f"{occupation}: {count}\n")
